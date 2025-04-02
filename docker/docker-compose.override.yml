@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: ../
+      dockerfile: ./app/Dockerfile
+      target: dev
+    volumes:
+      - ../app:/app/backend/app
+      - ../migrations:/app/migrationsc
+      - ../.env:/app/.env
+    environment:
+      - ENV=development
+      - PYTHONUNBUFFERED=1
+      # - PYTHONPATH=/app
+
+#    command: >
+#      sh -c "uvicorn app.api.main:app --host 0.0.0.0 --port 8000 --reload"
+    command: printenv
+    ports:
+      - "8000:8000"
