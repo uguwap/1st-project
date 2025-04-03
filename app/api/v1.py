@@ -1,20 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from app.models.request import RequestCreate, RequestRead, RequestUpdate, Request
-from app.database.session import AsyncSessionLocal
+from sqlalchemy import select, and_, func
 from typing import Optional
-from sqlalchemy import select, and_, cast, String, func
-from app.models.client import Client
-from app.core.dependencies import get_admin_user
-from app.tasks.reminderclient import send_feedback_reminder
+from uuid import UUID
 from datetime import timedelta, datetime
+
+from app.models.request import RequestCreate, RequestRead, RequestUpdate, Request
+from app.models.client import Client
+from app.core.dependencies import get_db, get_admin_user
+from app.tasks.reminderclient import send_feedback_reminder
+
 router = APIRouter(prefix="/requests", tags=["Заявки"])
 
-
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 @router.post("/", response_model=RequestRead)
 async def create_request(data: RequestCreate, db: AsyncSession = Depends(get_db)):
@@ -23,6 +20,7 @@ async def create_request(data: RequestCreate, db: AsyncSession = Depends(get_db)
     await db.commit()
     await db.refresh(new_request)
     return new_request
+
 
 @router.get("/", response_model=list[RequestRead])
 async def list_requests(
@@ -33,16 +31,16 @@ async def list_requests(
     db: AsyncSession = Depends(get_db)
 ):
     query = select(Request)
-
     filters = []
+
     if status:
         filters.append(Request.status == status)
     if city:
         filters.append(func.lower(Request.city).like(f"%{city.lower()}%"))
     if insect_type:
-        filters.append(func.lower(Request.insect_type).like(f"%{insect_type}%"))
+        filters.append(func.lower(Request.insect_type).like(f"%{insect_type.lower()}%"))
     if source:
-        filters.append(func.lower(Request.source).like(f"%{source}%"))
+        filters.append(func.lower(Request.source).like(f"%{source.lower()}%"))
 
     if filters:
         query = query.where(and_(*filters))
@@ -50,20 +48,21 @@ async def list_requests(
     result = await db.execute(query)
     return result.scalars().all()
 
+
 @router.get("/{request_id}", response_model=RequestRead)
-async def get_request(request_id: int, db: AsyncSession = Depends(get_db)):
+async def get_request(request_id: UUID, db: AsyncSession = Depends(get_db)):
     result = await db.get(Request, request_id)
     if not result:
         raise HTTPException(status_code=404, detail="Заявка не найдена")
     return result
 
+
 @router.patch("/{request_id}", response_model=RequestRead)
 async def update_request(
-        request_id: int,
-        data: RequestUpdate,
-        db: AsyncSession = Depends(get_db)
+    request_id: UUID,
+    data: RequestUpdate,
+    db: AsyncSession = Depends(get_db)
 ):
-
     req = await db.get(Request, request_id)
     if not req:
         raise HTTPException(status_code=404, detail="Заявка не найдена")
@@ -73,7 +72,8 @@ async def update_request(
     for field, value in data.dict(exclude_unset=True).items():
         setattr(req, field, value)
 
-    if data.status == "Завершено" and old_status != "Завершено":
+    is_completed = data.status == "Завершено" and old_status != "Завершено"
+    if is_completed:
         client = Client(
             name=req.insect_type,
             phone=req.phone,
@@ -86,15 +86,19 @@ async def update_request(
     await db.commit()
     await db.refresh(req)
 
-    if data.status == "Завершено" and old_status != "Завершено":
-        # Планируем задачу через 10 дней
+    if is_completed:
         eta = datetime.utcnow() + timedelta(days=10)
         send_feedback_reminder.apply_async((req.phone,), eta=eta)
 
     return req
 
+
 @router.delete("/{request_id}")
-async def delete_request(request_id: int, db: AsyncSession = Depends(get_db), _ = Depends(get_admin_user)):
+async def delete_request(
+    request_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: None = Depends(get_admin_user)
+):
     req = await db.get(Request, request_id)
     if not req:
         raise HTTPException(status_code=404, detail="Заявка не найдена")

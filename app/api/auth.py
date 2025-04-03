@@ -1,17 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.models.user import UserCreate, UserLogin, UserRead
-from app.models.user import User
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.models.user import User, UserCreate, UserLogin, UserRead
 from app.core.security import hash_password, verify_password, create_access_token
-from app.database.session import AsyncSessionLocal
-
+from app.core.dependencies import get_db
 
 router = APIRouter(prefix="/auth", tags=["Аутентификация"])
 
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 @router.post("/register", response_model=UserRead)
 async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
@@ -22,17 +20,18 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     new_user = User(
         username=data.username,
         hashed_password=hash_password(data.password),
-        is_admin=data.is_admin
+        is_admin=False  # по умолчанию
     )
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
     return new_user
 
+
 @router.post("/login")
 async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
-    query = await db.execute(select(User).where(User.username == data.username))
-    user = query.scalar_one_or_none()
+    result = await db.execute(select(User).where(User.username == data.username))
+    user = result.scalar_one_or_none()
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Неверные данные")
 

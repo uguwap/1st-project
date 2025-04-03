@@ -1,7 +1,6 @@
-
 from datetime import datetime
 from typing import Optional
-import uuid
+from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field
 
 
@@ -13,12 +12,19 @@ class RequestBase(SQLModel):
     insect_type: str
     treatment: str
     source: str
-    status: str = Field(default="В работе") # в работе | завершено | отменено
+    status: str = Field(default="В работе")  # В работе | Завершено | Отменено
+
+
+class Request(RequestBase, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 
 class RequestCreate(RequestBase):
     pass
 
-class RequestUpdate(RequestBase):
+
+class RequestUpdate(SQLModel):
     title: Optional[str] = None
     city: Optional[str] = None
     processed_at: Optional[datetime] = None
@@ -28,15 +34,13 @@ class RequestUpdate(RequestBase):
     source: Optional[str] = None
     status: Optional[str] = None
 
+
 class RequestRead(RequestBase):
-    id: int
+    id: UUID
     created_at: datetime
 
     class Config:
         from_attributes = True
-
-class Request(RequestBase):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
 
 

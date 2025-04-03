@@ -1,12 +1,5 @@
-from celery import Celery
+from .celery_app import celery_app
 
-celery_app = Celery(
-    "reminders",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0"
-)
-
-celery_app.conf.timezone = "UTC"
 
 
 

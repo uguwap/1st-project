@@ -11,4 +11,4 @@
 
 ## Запуск
 ```bash
-uvicorn app.api.main:app --reload
+uvicornП app.api.main:app --reload

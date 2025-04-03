@@ -13,9 +13,16 @@ class ReminderBase(SQLModel):
 class Reminder(ReminderBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
-class ReminderUpdate(ReminderBase):
+
+class ReminderUpdate(SQLModel):
     status: str
 
+
+class ReminderRead(ReminderBase):
+    id: UUID
+
+    class Config:
+        from_attributes = True
 
 
 
