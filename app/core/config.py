@@ -1,12 +1,8 @@
-from pydantic import computed_field
 from pydantic_settings import BaseSettings
+from pydantic import computed_field
 
 class Settings(BaseSettings):
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_HOST: str
-    DB_PORT: int
-    DB_NAME: str
+    DATABASE_URL: str
 
     SECRET_KEY: str
     ALGORITHM: str
@@ -19,13 +15,11 @@ class Settings(BaseSettings):
 
     @computed_field
     @property
-    def DATABASE_URL(self) -> str:
-        return (
-            f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}"
-            f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-        )
+    def db_url(self) -> str:
+        return self.DATABASE_URL
 
     class Config:
         env_file = ".env"
 
 settings = Settings()
+

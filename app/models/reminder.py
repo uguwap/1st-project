@@ -25,13 +25,6 @@ class ReminderRead(ReminderBase):
         from_attributes = True
 
 
-
-
-
-
-
-
-
 class ReminderRead(ReminderBase):
     id: UUID
 
