@@ -13,7 +13,8 @@ class RequestBase(SQLModel):
     treatment: str
     source: str
     status: str = Field(default="В работе")  # В работе | Завершено | Отменено
-
+    phone: str
+    address: str
 
 class Request(RequestBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -33,7 +34,7 @@ class RequestUpdate(SQLModel):
     treatment: Optional[str] = None
     source: Optional[str] = None
     status: Optional[str] = None
-
+    address: Optional[str] = None
 
 class RequestRead(RequestBase):
     id: UUID

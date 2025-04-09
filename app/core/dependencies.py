@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-
+from uuid import UUID
 from app.core.security import decode_access_token
 from app.models.user import User
 from app.database.session import AsyncSessionLocal
@@ -49,4 +49,12 @@ async def get_admin_user(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Доступ только для администраторов")
     return current_user
 
+def convert_uuid(raw: str) -> UUID:
+    try:
+        return UUID(raw)
+    except ValueError:
+        try:
+            return UUID(f"{raw[:8]}-{raw[8:12]}-{raw[12:16]}-{raw[16:20]}-{raw[20:]}")
+        except Exception:
+            raise ValueError("Неверный формат UUID")
 

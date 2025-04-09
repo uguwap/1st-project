@@ -4,10 +4,10 @@ from sqlalchemy import select, and_, func
 from typing import Optional
 from uuid import UUID
 from datetime import timedelta, datetime
-
+from fastapi import Path
 from app.models.request import RequestCreate, RequestRead, RequestUpdate, Request
 from app.models.client import Client
-from app.core.dependencies import get_db, get_admin_user
+from app.core.dependencies import get_db, get_admin_user, convert_uuid
 from app.tasks.reminderclient import send_feedback_reminder
 
 router = APIRouter(prefix="/requests", tags=["Заявки"])
@@ -50,8 +50,12 @@ async def list_requests(
 
 
 @router.get("/{request_id}", response_model=RequestRead)
-async def get_request(request_id: UUID, db: AsyncSession = Depends(get_db)):
-    result = await db.get(Request, request_id)
+async def get_request(
+    request_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    uuid = convert_uuid(request_id)
+    result = await db.get(Request, uuid)
     if not result:
         raise HTTPException(status_code=404, detail="Заявка не найдена")
     return result
