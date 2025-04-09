@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
+    REDIS_BROKER_URL: str
+    REDIS_BACKEND_URL: str
+
     TELEGRAM_BOT_TOKEN: str
     TELEGRAM_CHAT_ID: str
     WHATSAPP_API_URL: str

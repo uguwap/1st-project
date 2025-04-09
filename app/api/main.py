@@ -5,8 +5,11 @@ from app.api.auth import router as auth_router
 from app.api.reminders import router as reminders_router
 
 app = FastAPI(
-    title="Заявки",
-    version="1.0.0"
+    title="Study Project API",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
 )
 
 # /requests

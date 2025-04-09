@@ -1,19 +1,29 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
 from uuid import UUID, uuid4
-
+from pydantic import constr
 
 class UserBase(SQLModel):
     username: str
 
 
+
+
 class UserCreate(UserBase):
-    password: str
+    password: constr(min_length=6)
+    is_admin: bool = False
+
+    class Config:
+        from_attributes = True
 
 
 class UserLogin(SQLModel):
     username: str
     password: str
+
+class TokenResponse(SQLModel):
+    access_token: str
+    token_type: str
 
 
 class UserRead(UserBase):
