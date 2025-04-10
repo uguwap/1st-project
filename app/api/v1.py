@@ -67,7 +67,8 @@ async def update_request(
     data: RequestUpdate,
     db: AsyncSession = Depends(get_db)
 ):
-    req = await db.get(Request, request_id)
+    uuid = convert_uuid(request_id)
+    req = await db.get(Request, uuid)
     if not req:
         raise HTTPException(status_code=404, detail="Заявка не найдена")
 
