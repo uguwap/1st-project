@@ -5,6 +5,8 @@ from pydantic import constr
 
 class UserBase(SQLModel):
     username: str
+    phone: Optional[str] = None # номер для связи между админами и клиентами, хз мб потом уберу
+    full_name: Optional[str] = None
 
 class UserCreate(UserBase):
     password: constr(min_length=6)
