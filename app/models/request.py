@@ -5,9 +5,9 @@ from sqlmodel import SQLModel, Field
 
 
 class RequestBase(SQLModel):
-    title: str
+    title: str # надо сделать что то с этим полем, чтобы название заявки, отображало ее сущность. Например: город и цена или тип насекомы и город, чтобы клиент сам не называл заявку так как хочет, а это было видно только у админа (исполнителя заявки)
     city: str
-    processed_at: datetime
+    processed_at: datetime # тоже сомнительно, клиент это не должен указывать, это у нас указывает админ так же как и источник и способ обработки
     client_price: float
     final_price: Optional[float] = None
     insect_type: str

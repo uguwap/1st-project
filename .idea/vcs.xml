@@ -5,4 +5,7 @@
     <mapping directory="$PROJECT_DIR$/app" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/docker" vcs="Git" />
   </component>
+  <component name="VcsProjectSettings">
+    <option name="detectVcsMappingsAutomatically" value="false" />
+  </component>
 </project>

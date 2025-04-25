@@ -1,11 +1,10 @@
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from app.models.user import User, UserCreate, UserLogin, UserRead, TokenResponse
 from app.core.security import hash_password, verify_password, create_access_token
 from app.core.dependencies import get_db, get_current_user
-router = APIRouter(prefix="/auth", tags=["Аутентификация"])
+router = APIRouter(prefix="/auth", tags=["Аутентификация"]) # админский вход
 
 
 @router.post("/register", response_model=UserRead)
@@ -42,5 +41,8 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user # Для получения текущего пользователя, пока оставлю так.
     # Чтобы какая у него роль
+
+
+
 
 
