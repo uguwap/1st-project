@@ -1,33 +1,26 @@
-from sqlmodel import SQLModel, Field
-from typing import Optional
+from datetime import datetime
 from uuid import UUID, uuid4
-from datetime import date
+from sqlmodel import SQLModel, Field
 
 
 class ReminderBase(SQLModel):
-    request_id: UUID
-    contact_date: date
-    status: str = "Ожидает"
+    request_id: UUID                # Привязка к заявке
+    remind_at: datetime             # Дата и время, когда напомнить
+    is_sent: bool = False           # Напоминание уже отправлено или нет
 
 
 class Reminder(ReminderBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
-class ReminderUpdate(SQLModel):
-    status: str
-
-
-class ReminderRead(ReminderBase):
-    id: UUID
-
-    class Config:
-        from_attributes = True
+class ReminderCreate(ReminderBase):
+    pass
 
 
 class ReminderRead(ReminderBase):
     id: UUID
+    created_at: datetime
 
-    class Config:
-        from_attributes = True
+
 

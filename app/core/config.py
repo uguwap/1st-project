@@ -1,8 +1,11 @@
+import os
+
 from pydantic_settings import BaseSettings
 from pydantic import computed_field
 
 class Settings(BaseSettings):
     DATABASE_URL: str
+    DATABASE_URL_SYNC: str
 
     SECRET_KEY: str
     ALGORITHM: str
@@ -22,7 +25,8 @@ class Settings(BaseSettings):
         return self.DATABASE_URL
 
     class Config:
-        env_file = ".env"
+        env_file = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
+        env_file_encoding = "utf-8"
 
 settings = Settings()
 

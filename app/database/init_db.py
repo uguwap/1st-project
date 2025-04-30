@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app.models import user, request, client, reminder
+from app.models import user, request, reminder
 
 import asyncio
 from app.database.session import engine

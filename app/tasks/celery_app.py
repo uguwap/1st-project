@@ -1,10 +1,14 @@
 from celery import Celery
 from app.core.config import settings
+from app.tasks.send_reminder_task import send_reminder
 
-celery_app = Celery(
-    main="app",
+celery = Celery(
+    "study",
     broker=settings.REDIS_BROKER_URL,
-    backend=settings.REDIS_BACKEND_URL
+    backend=settings.REDIS_BACKEND_URL,
 )
 
-celery_app.conf.timezone = "UTC"
+celery.conf.task_routes = {
+    "app.tasks.send_reminder_task.send_reminder": {"queue": "reminders"}
+}
+
