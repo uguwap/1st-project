@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from app.api.requests import router as requests_router
 from app.api.auth import router as auth_router
 from app.api.reminders import router as reminders_router
-
+from app.api.analytics import router as analytics_router
 app = FastAPI(
     title="Study Project API",
     version="1.0.0",
@@ -10,7 +10,7 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json"
 )
-
+app.include_router(analytics_router)
 # /requests
 app.include_router(requests_router)
 

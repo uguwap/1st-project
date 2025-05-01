@@ -17,3 +17,4 @@ sync_engine = create_engine(
     pool_pre_ping=True,
     echo=False,
 )
+
