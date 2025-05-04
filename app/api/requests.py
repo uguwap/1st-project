@@ -12,7 +12,7 @@ from app.models.reminder_archive import ReminderArchive
 from app.models.user import User
 from app.tasks.send_reminder_task import send_reminder
 from app.api.auth import get_current_user
-
+from ml.predict_comment import predict_comment
 router = APIRouter(prefix="/requests", tags=["Заявки"])
 
 
@@ -22,25 +22,31 @@ async def create_request(
     session: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+
+    data = request_data.dict(exclude={"status", "comment"})
+
+    comment = predict_comment(
+        insect_type=data["insect_type"],
+        treatment=data["treatment"],
+        city=data["city"],
+        source=data["source"]
+    )
+
+    # Создаём новую заявку
     new_request = Request(
-        **request_data.dict(exclude={"status"}),
+        **data,
+        comment=comment,
         user_id=user.id,
         created_at=datetime.utcnow(),
-        status=False  # Всегда False при создании
+        status=False
     )
+
     session.add(new_request)
     await session.commit()
     await session.refresh(new_request)
+
     return new_request
 
-
-@router.get("", response_model=list[RequestRead])
-async def get_all_requests(
-    session: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    result = await session.execute(select(Request).where(Request.user_id == user.id))
-    return result.scalars().all()
 
 
 @router.get("/{request_id}", response_model=RequestRead)

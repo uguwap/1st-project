@@ -13,7 +13,7 @@ class RequestBase(SQLModel):
     source: str
     status: bool = Field(default=False)
     address: str
-    comment: Optional[str] = None
+    comment: Optional[str] = Field(default=None)
     price: int
 
 class Request(RequestBase, table=True):

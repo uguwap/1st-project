@@ -6,7 +6,8 @@ from sqlalchemy import select
 from app.database.session import get_db
 from app.models.user import User, UserCreate, UserRead
 from app.core.security import hash_password, verify_password, create_access_token
-
+from jose import JWTError, jwt
+from app.core.security import settings
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 # схема авторизации для Swagger и зависимостей
@@ -48,9 +49,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Async
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_db)) -> User:
-    from jose import JWTError, jwt
-    from app.core.security import settings
-
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
