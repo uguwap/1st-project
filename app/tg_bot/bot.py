@@ -52,7 +52,7 @@ async def start_handler(message: Message):
             payload="/start"
         )
     await message.answer(
-        "Здарова, старина! Готов к делу? Жми кнопку ниже и поехали.",
+        "Готов к делу? Жми кнопку ниже и поехали.",
         reply_markup=start_keyboard
     )
 
