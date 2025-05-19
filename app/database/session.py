@@ -11,7 +11,7 @@ async def get_db():
         yield session
 
 
-# sync engine только для фоновых задач
+
 sync_engine = create_engine(
     settings.DATABASE_URL_SYNC,
     pool_pre_ping=True,

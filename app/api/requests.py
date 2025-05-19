@@ -32,7 +32,6 @@ async def create_request(
         source=data["source"]
     )
 
-    # Создаём новую заявку
     new_request = Request(
         **data,
         comment=comment,
@@ -82,7 +81,7 @@ async def update_request(
     await session.refresh(db_request)
 
     if update_fields.get("status") is True and old_status is False:
-        # Копируем данные в архив
+
         archived = CompletedRequest(
             city=db_request.city,
             processed_at=db_request.processed_at,
