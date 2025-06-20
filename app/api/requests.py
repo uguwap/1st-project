@@ -13,6 +13,7 @@ from app.models.user import User
 from app.tasks.send_reminder_task import send_reminder
 from app.api.auth import get_current_user
 from ml.predict_comment import predict_comment
+from app.kafka.producer import send_request_completed_event
 router = APIRouter(prefix="/requests", tags=["Заявки"])
 
 
@@ -107,5 +108,6 @@ async def update_request(
         await session.commit()
 
         send_reminder.delay(str(new_reminder.id))
+        send_request_completed_event(db_request, executor=user)
 
     return db_request

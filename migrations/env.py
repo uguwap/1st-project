@@ -3,7 +3,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from sqlmodel import SQLModel
 from app.core.config import settings
-from app.models import request, reminder, reminder_archive, completed_request, user, telegram_profile, bot_logs
+from app.models import request, reminder, reminder_archive, completed_request, user, telegram_profile, bot_logs, analytics_raw
 
 
 # Alembic Config object
@@ -55,4 +55,13 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
+
+from app.models.analytics_raw import AnalyticsRaw
+from app.models.user import User
+from app.models.request import Request
+from app.models.reminder import Reminder
+from app.models.reminder_archive import ReminderArchive
+from app.models.completed_request import CompletedRequest
+from app.models.bot_logs import BotLog
+from app.models.telegram_profile import TelegramProfile
 

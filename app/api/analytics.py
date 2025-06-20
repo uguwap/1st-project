@@ -79,12 +79,12 @@ async def filter_requests(
     if to_date:
         stmt = stmt.where(model.created_at <= to_date)
 
-    # Сортировка
+
     sort_column = getattr(model, sort_by, None)
     if sort_column is not None:
         stmt = stmt.order_by(sort_column.desc() if sort_desc else sort_column.asc())
 
-    # Пагинация
+
     stmt = stmt.offset(offset).limit(limit)
 
     results = await session.execute(stmt)
