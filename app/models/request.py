@@ -1,48 +1,28 @@
-from datetime import datetime
-from typing import Optional
-from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field
+from uuid import UUID, uuid4
+from datetime import datetime
+from pydantic import constr, ConfigDict
 
+class UserBase(SQLModel):
+    username: str
+    phone: str = Field(..., regex=r"^8\d{10}$")
 
-class RequestBase(SQLModel):
-    city: str
-    processed_at: datetime
-    client_phone: str
-    insect_type: str
-    treatment: str
-    source: str
-    status: bool = Field(default=False)
-    address: str
-    comment: Optional[str] = Field(default=None)
-    price: int
-
-class Request(RequestBase, table=True):
+class User(UserBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    user_id: UUID = Field(foreign_key="user.id")
+    hashed_password: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-class RequestCreate(RequestBase):
-    pass
+class UserCreate(UserBase):
+    password: constr(min_length=6)
 
+    model_config = ConfigDict(from_attributes=True)
 
-class RequestUpdate(SQLModel):
-    city: Optional[str] = None
-    processed_at: Optional[datetime] = None
-    client_phone: Optional[str] = None
-    insect_type: Optional[str] = None
-    treatment: Optional[str] = None
-    source: Optional[str] = None
-    status: Optional[bool] = None
-    address: Optional[str] = None
-    comment: Optional[str] = None
-    price: Optional[int] = None
+class UserLogin(SQLModel):
+    username: str
+    password: str
 
-
-class RequestRead(RequestBase):
+class UserRead(UserBase):
     id: UUID
-    user_id: UUID
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)

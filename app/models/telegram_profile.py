@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field
-
+from pydantic import ConfigDict
 
 class TelegramProfile(SQLModel, table=True):
     __tablename__ = "telegram_profile"
@@ -12,5 +12,5 @@ class TelegramProfile(SQLModel, table=True):
     username: str | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-
+    model_config = ConfigDict(from_attributes=True)
 

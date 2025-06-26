@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
 from datetime import datetime
+from pydantic import ConfigDict
 
 class AnalyticsRaw(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -19,3 +20,6 @@ class AnalyticsRaw(SQLModel, table=True):
     executor_phone: Optional[str]
 
     recorded_at: datetime = Field(default_factory=datetime.utcnow)
+
+    model_config = ConfigDict(from_attributes=True)
+
